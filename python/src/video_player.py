@@ -253,21 +253,21 @@ class VideoPlayer:
         all_videos = self._video_library.get_all_videos()
         results = []
         for i in all_videos:
-            if search_term.lower() in i.title.lower():
+            if i.title.lower().find(search_term.lower()) != -1:
                 results.append(i)
-        
+
         results.sort(key = lambda x: x.title)
         if len(results) == 0:
             print("No search results for " + search_term)
         else:
             print("Here are the results for " + search_term)
-            for i in range(len(results)-1):
-                print(i + ") " + results[i].title + " (" + results[i].video_id + ") [" + ' '.join(results[i].tags) + "]")
+            for i in range(len(results)):
+                print(str(i) + ") " + results[i].title + " (" + results[i].video_id + ") [" + ' '.join(results[i].tags) + "]")
             print("Would you like to play any of the above? If yes, specify the number of the video.")
             print("If your answer is not a valid number, we will assume it's a no.")
             choice = input()
-            if choice.isdigit() and choice < len(results):
-                play_video(results[choice-1])
+            if choice.isdigit() and int(choice) < len(results):
+                self.play_video(results[int(choice) - 1].video_id)
 
 
     def search_videos_tag(self, video_tag):
@@ -276,7 +276,25 @@ class VideoPlayer:
         Args:
             video_tag: The video tag to be used in search.
         """
-        print("search_videos_tag needs implementation")
+        all_videos = self._video_library.get_all_videos()
+        results = []
+        for i in all_videos:
+            for j in i.tags:
+                if j.lower() == video_tag.lower() and i not in results:
+                    results.append(i)
+
+        results.sort(key = lambda x: x.title)
+        if len(results) == 0:
+            print("No search results for " + video_tag)
+        else:
+            print("Here are the results for " + video_tag)
+            for i in range(len(results)):
+                print(str(i) + ") " + results[i].title + " (" + results[i].video_id + ") [" + ' '.join(results[i].tags) + "]")
+            print("Would you like to play any of the above? If yes, specify the number of the video.")
+            print("If your answer is not a valid number, we will assume it's a no.")
+            choice = input()
+            if choice.isdigit() and int(choice) < len(results):
+                self.play_video(results[int(choice) - 1].video_id)
 
     def flag_video(self, video_id, flag_reason=""):
         """Mark a video as flagged.
